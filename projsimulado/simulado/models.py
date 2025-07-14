@@ -47,8 +47,8 @@ class Questao(models.Model):
     def clean(self):
         if len(self.enunciado) < 10:
             raise ValidationError({'enunciado': 'O enunciado deve ter pelo menos 10 caracteres.'})
-        if len(self.enunciado) > 150:
-            raise ValidationError({'enunciado': 'O enunciado não pode ter mais de 150 caracteres.'})
+        if len(self.enunciado) > 1000:
+            raise ValidationError({'enunciado': 'O enunciado não pode ter mais de 1000 caracteres.'})
         
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -107,10 +107,6 @@ class Simulado(models.Model):
             erros['tema'] = 'O tema deve ter pelo menos 5 caracteres.'
         if len(self.tema) > 30:
             erros['tema'] = 'O tema não pode ter mais de 30 caracteres.'
-        if self.questoes.count() < 10:
-            erros['questoes'] = 'O simulado deve conter pelo menos 10 questões.'
-        if self.questoes.count() > 90:
-            erros['questoes'] = 'O simulado não pode conter mais de 90 questões.'
         if not self.usuario:
             erros['usuario'] = 'O simulado deve estar associado a um usuário.'
         
@@ -122,7 +118,7 @@ class Simulado(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'Simulado sobre: {self.tema} - Criado em: {self.data_criacao.strftime("%d-%m-%Y %H:%M:%S")}'
+        return f'Simulado sobre: {self.tema}'
 
     class Meta:
         verbose_name = 'Simulado'
