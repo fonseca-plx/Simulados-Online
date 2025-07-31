@@ -1,0 +1,70 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}Lista de Simulados - Simulados Online{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <h1 class="mb-4">Lista de Simulados</h1>
+    <div class="table-responsive table-striped table-hover align-middle">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tema</th>
+                    <th>Quantidade de questões</th>
+                    <th>Data de Criação</th>
+                    <th>Usuário</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for simulado in simulados %}
+                <tr class="clickable-row" data-href="{% url 'simulado:detalhar_simulado' simulado.id %}" style="cursor: pointer;">
+                    <td>{{ simulado.tema }}</td>
+                    <td>{{ simulado.qtd_questoes }}</td>
+                    <td>{{ simulado.data_formatada }}</td>
+                    <td>{{ simulado.usuario }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Nenhum simulado encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.clickable-row:hover {
+    background-color: #f8f9fa !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.clickable-row {
+    transition: all 0.2s ease-in-out;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('.clickable-row');
+    
+    rows.forEach(function(row) {
+        row.addEventListener('click', function() {
+            const href = this.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+        
+        // Adiciona efeito visual ao passar o mouse
+        row.addEventListener('mouseenter', function() {
+            this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

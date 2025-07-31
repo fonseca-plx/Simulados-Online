@@ -101,8 +101,17 @@ class Simulado(models.Model):
     questoes = models.ManyToManyField(Questao, related_name='simulados', through='Peso')
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='simulados')
 
+    @property
+    def qtd_questoes(self):
+        return self.questoes.count()
+    @property 
+    def data_formatada(self):
+        return self.data_criacao.strftime('%d/%m/%Y')
+
     def clean(self):
         erros = {}
+        if not self.tema:
+            erros['tema'] = 'O tema não pode ser vazio.'
         if len(self.tema) < 5:
             erros['tema'] = 'O tema deve ter pelo menos 5 caracteres.'
         if len(self.tema) > 30:

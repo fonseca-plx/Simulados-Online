@@ -1,0 +1,71 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}{{ simulado.tema }} - Simulados Online{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ simulado.tema }}</h1>
+        <a href="{% url 'simulado:listar_simulados' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Informações do Simulado</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Tema:</strong> {{ simulado.tema }}</p>
+                    <p><strong>Quantidade de questões:</strong> {{ simulado.qtd_questoes }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Data de Criação:</strong> {{ simulado.data_formatada }}</p>
+                    <p><strong>Criado por:</strong> {{ simulado.usuario }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if simulado.questoes.all %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Questões do Simulado</h5>
+        </div>
+        <div class="card-body">
+            {% for questao in simulado.questoes.all %}
+            <div class="mb-4 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                <h6 class="fw-bold">Questão {{ forloop.counter }}</h6>
+                <p class="mb-3">{{ questao.enunciado }}</p>
+                
+                {% if questao.alternativas.all %}
+                <div class="ms-3">
+                    {% for alternativa in questao.alternativas.all %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="questao_{{ questao.id }}" 
+                               id="alt_{{ alternativa.id }}" disabled>
+                        <label class="form-check-label {% if alternativa.correta %}text-success fw-bold{% endif %}" 
+                               for="alt_{{ alternativa.id }}">
+                            {{ alternativa.texto }}
+                            {% if alternativa.correta %}
+                                <i class="fas fa-check-circle text-success ms-1"></i>
+                            {% endif %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        Este simulado ainda não possui questões cadastradas.
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

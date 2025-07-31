@@ -1,0 +1,19 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}Home - Simulados Online{% endblock %}
+
+{% block content %}
+<section class="text-center py-5 bg-light rounded shadow-sm">
+    <div class="container">
+        <h1 class="display-5 fw-bold">Bem-vindo ao Simulados Online!</h1>
+        <h2 class="display-8 fw-light">Sua plataforma de simulados colaborativos</h2>
+        <p class="lead">Faça login para cadastrar questões e criar novos simulados ou veja os simulados disponíveis.</p>
+        <a href="#" class="btn btn-primary mt-3">
+            Fazer Login
+        </a>
+        <a href="{% url 'simulado:listar_simulados' %}" class="btn btn-secondary mt-3">
+            Ver Simulados Disponíveis
+        </a>
+    </div>
+</section>
+{% endblock %}
