@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, DetailView
 from simulado.services.casousosimulado import SimuladoService
@@ -26,6 +26,18 @@ class DetalharSimuladoView(DetailView):
     pk_url_kwarg = 'simulado_id'
 
 class CalcularResultadoView(View):
+    def get(self, request, *args, **kwargs):
+        """
+        Redireciona para a página de detalhes do simulado.
+        """
+        simulado_id = kwargs.get('simulado_id')
+        simulado = SimuladoService.buscar_simulados().filter(id=simulado_id).first()
+        
+        if not simulado:
+            return render(request, '404.html', status=404)
+        
+        return redirect('simulado:detalhar_simulado', simulado_id=simulado.id)
+
     def post(self, request, *args, **kwargs):
         """
         Calcula o resultado do simulado com base nas respostas fornecidas.
