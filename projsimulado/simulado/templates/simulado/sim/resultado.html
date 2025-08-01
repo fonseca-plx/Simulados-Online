@@ -1,0 +1,105 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}Resultado do Simulado - {{ resultado.simulado.tema }}{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Resultado do Simulado</h1>
+        <div>
+            <a href="{% url 'simulado:detalhar_simulado' resultado.simulado.id %}" class="btn btn-secondary">
+                Voltar ao Simulado
+            </a>
+            <a href="{% url 'simulado:listar_simulados' %}" class="btn btn-primary">
+                Ver Outros Simulados
+            </a>
+        </div>
+    </div>
+
+    <!-- Resumo do Resultado -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Resumo do Resultado</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="text-primary">{{ resultado.acertos }}/{{ resultado.total_questoes }}</h3>
+                        <p class="mb-0">Acertos</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="{% if resultado.porcentagem >= 70 %}text-success{% elif resultado.porcentagem >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                            {{ resultado.porcentagem|floatformat:1 }}%
+                        </h3>
+                        <p class="mb-0">Aproveitamento</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="text-info">{{ resultado.pontuacao }}</h3>
+                        <p class="mb-0">Pontuação</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="text-muted">{{ resultado.simulado.tema }}</h3>
+                        <p class="mb-0">Tema</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalhamento das Questões -->
+    {% if resultado.detalhes %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Detalhamento das Questões</h5>
+        </div>
+        <div class="card-body">
+            {% for detalhe in resultado.detalhes %}
+            <div class="mb-4 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-bold">Questão {{ forloop.counter }}</h6>
+                    <span class="badge {% if detalhe.acertou %}bg-success{% else %}bg-danger{% endif %}">
+                        {% if detalhe.acertou %}Acertou{% else %}Errou{% endif %}
+                    </span>
+                </div>
+                
+                <p class="mb-3">{{ detalhe.questao.enunciado }}</p>
+
+                <div class="ms-3">
+                    {% for alternativa in detalhe.questao.alternativas.all %}
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center">
+                            {% if alternativa == detalhe.resposta_correta %}
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                            {% elif alternativa == detalhe.resposta_usuario and not detalhe.acertou %}
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                            {% else %}
+                                <i class="fas fa-circle text-muted me-2" style="font-size: 0.8rem;"></i>
+                            {% endif %}
+                            
+                            <span class="{% if alternativa == detalhe.resposta_correta %}text-success fw-bold{% elif alternativa == detalhe.resposta_usuario and not detalhe.acertou %}text-danger{% endif %}">
+                                {{ alternativa.texto }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if not detalhe.resposta_usuario %}
+                <div class="mt-2">
+                    <small class="text-muted"><i class="fas fa-info-circle"></i> Questão não respondida</small>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

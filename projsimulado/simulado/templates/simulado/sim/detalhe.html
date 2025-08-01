@@ -2,15 +2,28 @@
 
 {% block title %}{{ simulado.tema }} - Simulados Online{% endblock %}
 
+{% block style %}
+<style>
+    .iniciar-simulado {
+        display: none;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ simulado.tema }}</h1>
-        <a href="{% url 'simulado:listar_simulados' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar à Lista
-        </a>
+        <div>
+            <a href="{% url 'simulado:listar_simulados' %}" class="btn btn-secondary">
+                Voltar à Lista
+            </a>
+            <a class="btn btn-primary">
+                Iniciar Simulado
+            </a>
+        </div>
     </div>
-    
+
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Informações do Simulado</h5>
@@ -30,36 +43,38 @@
     </div>
 
     {% if simulado.questoes.all %}
-    <div class="card">
+    <div class="card iniciar-simulado mb-4">
         <div class="card-header">
             <h5 class="mb-0">Questões do Simulado</h5>
         </div>
-        <div class="card-body">
-            {% for questao in simulado.questoes.all %}
-            <div class="mb-4 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
-                <h6 class="fw-bold">Questão {{ forloop.counter }}</h6>
-                <p class="mb-3">{{ questao.enunciado }}</p>
-                
-                {% if questao.alternativas.all %}
-                <div class="ms-3">
-                    {% for alternativa in questao.alternativas.all %}
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="questao_{{ questao.id }}" 
-                               id="alt_{{ alternativa.id }}" disabled>
-                        <label class="form-check-label {% if alternativa.correta %}text-success fw-bold{% endif %}" 
-                               for="alt_{{ alternativa.id }}">
-                            {{ alternativa.texto }}
-                            {% if alternativa.correta %}
-                                <i class="fas fa-check-circle text-success ms-1"></i>
-                            {% endif %}
-                        </label>
+        <form action="{% url 'simulado:calcular_resultado' simulado.id %}" method="post">
+            {% csrf_token %}
+            <div class="card-body">
+                {% for questao in simulado.questoes.all %}
+                <div class="mb-4 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                    <h6 class="fw-bold">Questão {{ forloop.counter }}</h6>
+                    <p class="mb-3">{{ questao.enunciado }}</p>
+
+                    {% if questao.alternativas.all %}
+                    <div class="ms-3">
+                        {% for alternativa in questao.alternativas.all %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="questao_{{ questao.id }}"
+                                value="{{ alternativa.id }}" id="alt_{{ alternativa.id }}">
+                            <label class="form-check-label" for="alt_{{ alternativa.id }}">
+                                {{ alternativa.texto }}
+                            </label>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
-                {% endif %}
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
+            <div class="card-footer text-end">
+                <button type="submit" class="btn btn-success">Enviar Respostas</button>
+            </div>
+        </form>
     </div>
     {% else %}
     <div class="alert alert-info">
@@ -68,4 +83,55 @@
     </div>
     {% endif %}
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const iniciarBtn = document.querySelector('.btn-primary');
+        const iniciarCard = document.querySelector('.iniciar-simulado');
+        const form = document.querySelector('form');
+
+        iniciarBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            iniciarCard.style.display = 'block';
+            window.scrollTo({
+                top: iniciarCard.offsetTop,
+                behavior: 'smooth'
+            });
+        });
+
+        // Validação do formulário
+        if (form) {
+            form.addEventListener('submit', function (event) {
+                const questoes = document.querySelectorAll('input[type="radio"]');
+                const questoesRespondidas = new Set();
+                
+                questoes.forEach(function (radio) {
+                    if (radio.checked) {
+                        const questaoId = radio.name.replace('questao_', '');
+                        questoesRespondidas.add(questaoId);
+                    }
+                });
+
+                const totalQuestoes = new Set();
+                questoes.forEach(function (radio) {
+                    const questaoId = radio.name.replace('questao_', '');
+                    totalQuestoes.add(questaoId);
+                });
+
+                if (questoesRespondidas.size < totalQuestoes.size) {
+                    event.preventDefault();
+                    const questoesFaltando = totalQuestoes.size - questoesRespondidas.size;
+                    alert(`Por favor, responda todas as questões. Ainda faltam ${questoesFaltando} questão(ões).`);
+                    return false;
+                }
+
+                // Confirma o envio
+                if (!confirm('Tem certeza que deseja enviar suas respostas? Esta ação não pode ser desfeita.')) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
