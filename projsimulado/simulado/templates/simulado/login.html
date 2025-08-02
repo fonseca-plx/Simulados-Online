@@ -1,0 +1,69 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}Login - Simulados Online{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white text-center">
+                <h4 class="mb-0">Login</h4>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show{% if message.tags == 'error' %} alert-danger-custom{% endif %}" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nome de usuário</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark">Entrar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">Ainda não possui uma conta?</p>
+                <a href="#" class="btn btn-link">Cadastre-se aqui</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .alert-danger-custom {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+        border-color: #f5c6cb !important;
+    }
+    
+    .alert-danger-custom .btn-close {
+        filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(3000%) hue-rotate(350deg);
+    }
+</style>
+
+<script>
+    // Fechar automaticamente alertas de erro após 5 segundos
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
+</script>
+{% endblock %}
