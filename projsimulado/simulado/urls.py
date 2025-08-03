@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.usuarios import LoginView, LogoutView
+from .views.usuarios import CadastrarUsuarioView, LoginView, LogoutView
 from .views.index import IndexView
 from .views.simulados import ListarSimuladosView, DetalharSimuladoView, CalcularResultadoView
 
@@ -11,6 +11,7 @@ urlpatterns = [
     # URL patterns for user authentication
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("cadastrar/", CadastrarUsuarioView.as_view(), name="cadastrar_usuario"),
     
     # URL patterns for simulados
     path("simulados/", ListarSimuladosView.as_view(), name="listar_simulados"),
