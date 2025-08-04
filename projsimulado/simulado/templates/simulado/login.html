@@ -10,14 +10,7 @@
                 <h4 class="mb-0">Login</h4>
             </div>
             <div class="card-body">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show{% if message.tags == 'error' %} alert-danger-custom{% endif %}" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+                {% include 'simulado/messages.html' %}
 
                 <form method="post">
                     {% csrf_token %}
@@ -41,29 +34,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .alert-danger-custom {
-        background-color: #f8d7da !important;
-        color: #721c24 !important;
-        border-color: #f5c6cb !important;
-    }
-    
-    .alert-danger-custom .btn-close {
-        filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(3000%) hue-rotate(350deg);
-    }
-</style>
-
-<script>
-    // Fechar automaticamente alertas de erro após 5 segundos
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            setTimeout(function() {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }, 5000);
-        });
-    });
-</script>
 {% endblock %}
