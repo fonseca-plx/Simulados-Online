@@ -1,0 +1,375 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}Criar Nova Questão - Simulados Online{% endblock %}
+
+{% block style %}
+<style>
+    .alternativa-group {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8f9fa;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .alternativa-group:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+    }
+    
+    .alternativa-group.correta {
+        border-color: #198754;
+        background-color: #d1e7dd;
+    }
+    
+    .alternativa-number {
+        background-color: #6c757d;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+    
+    .form-check-input:checked + .form-check-label .alternativa-number {
+        background-color: #198754;
+    }
+    
+    .char-counter {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .char-counter.warning {
+        color: #fd7e14;
+    }
+    
+    .char-counter.danger {
+        color: #dc3545;
+    }
+    
+    .required-label::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .alert-custom {
+        border-radius: 0.5rem;
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(45deg, #198754, #20c997);
+        border: none;
+        font-weight: 600;
+        padding: 12px 30px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        background: linear-gradient(45deg, #157347, #1aa179);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(45deg, #343a40, #495057);
+        border-bottom: 3px solid #198754;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+        <div class="card shadow-lg">
+            <div class="card-header card-header-custom text-white text-center">
+                <h3 class="mb-0">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Criar Nova Questão
+                </h3>
+                <small class="text-light">Preencha todos os campos obrigatórios para criar uma questão</small>
+            </div>
+            
+            <div class="card-body p-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'danger' }} alert-custom alert-dismissible fade show" role="alert">
+                            <strong>
+                                {% if message.tags == 'error' or message.tags == 'danger' %}
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Erro!
+                                {% elif message.tags == 'warning' %}
+                                    <i class="bi bi-exclamation-circle me-2"></i>Atenção!
+                                {% elif message.tags == 'success' %}
+                                    <i class="bi bi-check-circle me-2"></i>Sucesso!
+                                {% else %}
+                                    <i class="bi bi-info-circle me-2"></i>Info!
+                                {% endif %}
+                            </strong>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" id="questaoForm">
+                    {% csrf_token %}
+                    
+                    <!-- Dados da Questão -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <label for="enunciado" class="form-label required-label">Enunciado da Questão</label>
+                            <textarea 
+                                class="form-control" 
+                                id="enunciado" 
+                                name="enunciado" 
+                                rows="4" 
+                                maxlength="1000"
+                                placeholder="Digite o enunciado da questão aqui..."
+                                required>{{ enunciado|default:'' }}</textarea>
+                            <div class="char-counter mt-1">
+                                <span id="enunciado-counter">0</span>/1000 caracteres
+                            </div>
+                            <div class="form-text">
+                                O enunciado deve ter entre 10 e 1000 caracteres.
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="assunto" class="form-label required-label">Assunto</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="assunto" 
+                                name="assunto" 
+                                maxlength="100"
+                                placeholder="Ex: Matemática, História..."
+                                value="{{ assunto|default:'' }}"
+                                required>
+                            <div class="form-text">
+                                Máximo 100 caracteres.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alternativas -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="bi bi-list-check me-2"></i>
+                            Alternativas
+                            <small class="text-muted">(Selecione apenas 1 alternativa correta)</small>
+                        </h5>
+                        
+                        <div id="alternativas-container">
+                            {% for i in "12345" %}
+                                <div class="alternativa-group" data-index="{{ forloop.counter }}">
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="radio" 
+                                            name="alternativa_correta" 
+                                            id="correta_{{ forloop.counter }}"
+                                            value="{{ forloop.counter }}"
+                                            {% if alternativas_data and alternativas_data|length >= forloop.counter and alternativas_data.forloop.counter0.correta %}checked{% endif %}>
+                                        
+                                        <label class="form-check-label w-100 d-flex align-items-center" for="correta_{{ forloop.counter }}">
+                                            <span class="alternativa-number">{{ forloop.counter|upper|slice:":1" }}</span>
+                                            <div class="flex-grow-1">
+                                                <input 
+                                                    type="text" 
+                                                    class="form-control alternativa-texto" 
+                                                    name="alternativa_{{ forloop.counter }}" 
+                                                    id="alternativa_{{ forloop.counter }}"
+                                                    maxlength="100"
+                                                    placeholder="Digite o texto da alternativa {{ forloop.counter|upper|slice:":1" }}..."
+                                                    value="{% if alternativas_data and alternativas_data|length >= forloop.counter %}{{ alternativas_data.forloop.counter0.texto|default:'' }}{% endif %}"
+                                                    required>
+                                                <div class="char-counter mt-1">
+                                                    <span class="alt-counter">0</span>/100 caracteres
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="alert alert-info alert-custom mt-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Instruções:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Preencha todas as 5 alternativas</li>
+                                <li>Marque apenas 1 alternativa como correta</li>
+                                <li>Cada alternativa pode ter no máximo 100 caracteres</li>
+                                <li>As alternativas não podem ter textos duplicados</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'simulado:listar_questoes' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Voltar para Lista
+                        </a>
+                        
+                        <button type="submit" class="btn btn-success btn-submit">
+                            <i class="bi bi-check-lg me-2"></i>
+                            Criar Questão
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Contador de caracteres para o enunciado
+    const enunciadoTextarea = document.getElementById('enunciado');
+    const enunciadoCounter = document.getElementById('enunciado-counter');
+    
+    function updateEnunciadoCounter() {
+        const length = enunciadoTextarea.value.length;
+        enunciadoCounter.textContent = length;
+        
+        // Mudança de cor baseada no limite
+        const counterElement = enunciadoCounter.parentElement;
+        if (length > 900) {
+            counterElement.className = 'char-counter mt-1 danger';
+        } else if (length > 800) {
+            counterElement.className = 'char-counter mt-1 warning';
+        } else {
+            counterElement.className = 'char-counter mt-1';
+        }
+    }
+    
+    enunciadoTextarea.addEventListener('input', updateEnunciadoCounter);
+    updateEnunciadoCounter(); // Inicializar contador
+    
+    // Contador de caracteres para alternativas
+    const alternativaInputs = document.querySelectorAll('.alternativa-texto');
+    alternativaInputs.forEach(function(input, index) {
+        const counter = input.closest('.alternativa-group').querySelector('.alt-counter');
+        
+        function updateCounter() {
+            const length = input.value.length;
+            counter.textContent = length;
+            
+            const counterElement = counter.parentElement;
+            if (length > 90) {
+                counterElement.className = 'char-counter mt-1 danger';
+            } else if (length > 80) {
+                counterElement.className = 'char-counter mt-1 warning';
+            } else {
+                counterElement.className = 'char-counter mt-1';
+            }
+        }
+        
+        input.addEventListener('input', updateCounter);
+        updateCounter(); // Inicializar contador
+    });
+    
+    // Destacar alternativa correta
+    const radioInputs = document.querySelectorAll('input[name="alternativa_correta"]');
+    radioInputs.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            // Remover destaque de todas as alternativas
+            document.querySelectorAll('.alternativa-group').forEach(function(group) {
+                group.classList.remove('correta');
+            });
+            
+            // Adicionar destaque à alternativa selecionada
+            if (this.checked) {
+                this.closest('.alternativa-group').classList.add('correta');
+            }
+        });
+        
+        // Verificar estado inicial
+        if (radio.checked) {
+            radio.closest('.alternativa-group').classList.add('correta');
+        }
+    });
+    
+    // Validação do formulário
+    const form = document.getElementById('questaoForm');
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Verificar enunciado
+        const enunciado = enunciadoTextarea.value.trim();
+        if (enunciado.length < 10) {
+            isValid = false;
+            errorMessage += 'O enunciado deve ter pelo menos 10 caracteres.\n';
+        }
+        
+        // Verificar se todas as alternativas estão preenchidas
+        let alternativasPreenchidas = 0;
+        const textosAlternativas = [];
+        
+        alternativaInputs.forEach(function(input) {
+            const texto = input.value.trim();
+            if (texto) {
+                alternativasPreenchidas++;
+                textosAlternativas.push(texto.toLowerCase());
+            }
+        });
+        
+        if (alternativasPreenchidas < 5) {
+            isValid = false;
+            errorMessage += 'Todas as 5 alternativas devem ser preenchidas.\n';
+        }
+        
+        // Verificar textos duplicados
+        const textosUnicos = [...new Set(textosAlternativas)];
+        if (textosUnicos.length !== textosAlternativas.length) {
+            isValid = false;
+            errorMessage += 'Não pode haver alternativas com textos duplicados.\n';
+        }
+        
+        // Verificar se uma alternativa está marcada como correta
+        const alternativaCorreta = document.querySelector('input[name="alternativa_correta"]:checked');
+        if (!alternativaCorreta) {
+            isValid = false;
+            errorMessage += 'Selecione uma alternativa como correta.\n';
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Erro na validação:\n\n' + errorMessage);
+        }
+    });
+    
+    // Adicionar evento para sincronizar radio com input hidden
+    radioInputs.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            // Limpar todos os inputs hidden de correta
+            for (let i = 1; i <= 5; i++) {
+                const hiddenInput = document.querySelector(`input[name="correta_${i}"]`);
+                if (hiddenInput) {
+                    hiddenInput.remove();
+                }
+            }
+            
+            // Adicionar input hidden para a alternativa selecionada
+            if (this.checked) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `correta_${this.value}`;
+                hiddenInput.value = 'on';
+                form.appendChild(hiddenInput);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

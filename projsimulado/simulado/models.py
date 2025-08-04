@@ -33,7 +33,7 @@ class Usuario(User):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.username
+        return self.nome
 
     class Meta:
         verbose_name = 'Usuário'
@@ -41,6 +41,7 @@ class Usuario(User):
         ordering = ['username']
 
 class Questao(models.Model):
+    assunto = models.CharField(max_length=100, blank=True, null=True)
     enunciado = models.TextField()
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='questoes')
 
@@ -132,7 +133,7 @@ class Simulado(models.Model):
     class Meta:
         verbose_name = 'Simulado'
         verbose_name_plural = 'Simulados'
-        ordering = ['-data_criacao']
+        ordering = ['tema', '-data_criacao']
 
 class Peso(models.Model):
     valor = models.IntegerField()

@@ -20,10 +20,34 @@
 <section class="container py-5">
     <h1 class="mb-4">Lista de Simulados</h1>
     <form method="get" class="mb-4">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Pesquisar por tema..." aria-label="Pesquisar por tema..." name="tema">
-            <button class="btn btn-dark" type="submit">Buscar</button>
-        </div>
+        {% if user.is_authenticated %}
+            <div class="row g-2">
+                <div class="col-4">
+                    <input type="text" class="form-control" placeholder="Pesquisar por tema..." aria-label="Pesquisar por tema..." name="tema" value="{{ request.GET.tema }}">
+                </div>
+                <div class="col-4">
+                    <input type="text" class="form-control" placeholder="Pesquisar por usuário..." aria-label="Pesquisar por usuário..." name="usuario" value="{{ request.GET.usuario }}">
+                </div>
+                <div class="col-2">
+                    <button class="btn btn-dark w-100" type="submit">Buscar</button>
+                </div>
+                <div class="col-2">
+                    <a href="#" class="btn btn-success w-100">Novo Simulado</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="row g-2">
+                <div class="col-5">
+                    <input type="text" class="form-control" placeholder="Pesquisar por tema..." aria-label="Pesquisar por tema..." name="tema" value="{{ request.GET.tema }}">
+                </div>
+                <div class="col-5">
+                    <input type="text" class="form-control" placeholder="Pesquisar por usuário..." aria-label="Pesquisar por usuário..." name="usuario" value="{{ request.GET.usuario }}">
+                </div>
+                <div class="col-2">
+                    <button class="btn btn-dark w-100" type="submit">Buscar</button>
+                </div>
+            </div>
+        {% endif %}
     </form>
     <div class="table-responsive table-striped table-hover align-middle">
         <table class="table">

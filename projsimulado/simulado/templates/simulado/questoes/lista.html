@@ -1,0 +1,88 @@
+{% extends 'simulado/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Questões - Simulados Online{% endblock %}
+
+{% block style %}
+<style>
+    .clickable-row:hover {
+        background-color: #f8f9fa !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .clickable-row {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .action-buttons {
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <h1 class="mb-4">Lista de Questões</h1>
+    <form method="get" class="mb-4">
+        <div class="row g-2">
+            {% if user.is_authenticated %}
+                <div class="col-3">
+                    <input type="text" class="form-control" placeholder="Pesquisar por enunciado..." aria-label="Pesquisar por enunciado..." name="enunciado" value="{{ request.GET.enunciado }}">
+                </div>
+                <div class="col-3">
+                    <input type="text" class="form-control" placeholder="Pesquisar por assunto..." aria-label="Pesquisar por assunto..." name="assunto" value="{{ request.GET.assunto }}">
+                </div>
+                <div class="col-3">
+                    <input type="text" class="form-control" placeholder="Pesquisar por usuário..." aria-label="Pesquisar por usuário..." name="usuario" value="{{ request.GET.usuario }}">
+                </div>
+                <div class="col-1">
+                    <button class="btn btn-dark w-100" type="submit">Buscar</button>
+                </div>
+                <div class="col-2">
+                    <a href="{% url 'simulado:criar_questao' %}" class="btn btn-success w-100">Nova Questão</a>
+                </div>
+            {% else %}
+                <div class="col-md-4">
+                    <input type="text" class="form-control" placeholder="Pesquisar por enunciado..." aria-label="Pesquisar por enunciado..." name="enunciado" value="{{ request.GET.enunciado }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Pesquisar por assunto..." aria-label="Pesquisar por assunto..." name="assunto" value="{{ request.GET.assunto }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Pesquisar por usuário..." aria-label="Pesquisar por usuário..." name="usuario" value="{{ request.GET.usuario }}">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-dark w-100" type="submit">Buscar</button>
+                </div>
+            {% endif %}
+        </div>
+    </form>
+    <div class="table-responsive table-striped table-hover align-middle">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Enunciado</th>
+                    <th>Assunto</th>
+                    <th>Usuário</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for questao in questoes %}
+                <tr class="clickable-row" style="cursor: pointer;">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ questao.enunciado|truncatewords:15 }}</td>
+                    <td>{{ questao.assunto|default:"Sem assunto" }}</td>
+                    <td>{{ questao.usuario.nome }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Nenhuma questão encontrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

@@ -6,11 +6,19 @@
 <section class="text-center py-5 bg-light rounded shadow-sm">
     <div class="container">
         <h1 class="display-5 fw-bold">Bem-vindo ao Simulados Online!</h1>
-        <h2 class="display-8 fw-light">Sua plataforma de simulados colaborativos</h2>
-        <p class="lead">Faça login para cadastrar questões e criar novos simulados ou veja os simulados disponíveis.</p>
-        <a href="{% url 'simulado:login' %}" class="btn btn-primary mt-3">
-            Fazer Login
-        </a>
+
+        {% if user.is_authenticated %}
+            <p class="lead">Olá, {{ user }}.</p>
+            <p class="lead">Você pode cadastrar novas questões, criar novos simulados ou ver os simulados disponíveis.</p>
+            <a href="{% url 'simulado:criar_questao' %}" class="btn btn-primary mt-3">
+                Cadastrar Questões
+            </a>
+        {% else %}
+            <p class="lead">Faça login para cadastrar questões e criar novos simulados ou veja os simulados disponíveis.</p>
+            <a href="{% url 'simulado:login' %}" class="btn btn-primary mt-3">
+                Fazer Login
+            </a>
+        {% endif %}
         <a href="{% url 'simulado:listar_simulados' %}" class="btn btn-secondary mt-3">
             Ver Simulados Disponíveis
         </a>

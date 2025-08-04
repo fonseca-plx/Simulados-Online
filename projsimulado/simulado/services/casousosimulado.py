@@ -14,7 +14,7 @@ class SimuladoService:
         if data_criacao:
             simulados = simulados.filter(data_criacao__date=data_criacao)
         if usuario:
-            simulados = simulados.filter(usuario=usuario)
+            simulados = simulados.filter(usuario__username=usuario)
         
         return simulados
     
