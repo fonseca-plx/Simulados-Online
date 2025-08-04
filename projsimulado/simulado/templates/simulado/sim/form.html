@@ -1,0 +1,295 @@
+{% extends 'simulado/base.html' %}
+
+{% block title %}Criar Novo Simulado - Simulados Online{% endblock %}
+
+{% load static %}
+
+{% block style %}
+<link href="{% static 'css/criar_simulado.css' %}" rel="stylesheet">
+<style>
+    .questao-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    
+    .questao-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-color: #007bff;
+    }
+    
+    .questao-card.selected {
+        border-color: #28a745;
+        box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+        background-color: #f8fff9;
+    }
+    
+    .questao-checkbox {
+        transform: scale(1.2);
+        margin-right: 10px;
+    }
+    
+    .peso-input {
+        max-width: 80px;
+    }
+    
+    .questao-assunto {
+        background-color: #007bff;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+    
+    .contador-questoes {
+        top: 20px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    }
+    
+    .btn-criar-questao {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-criar-questao:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+    }
+    
+    .form-floating {
+        margin-bottom: 20px;
+    }
+    
+    .questoes-grid {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    .questoes-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .questoes-grid::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .questoes-grid::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+    
+    .questoes-grid::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Criar Novo Simulado
+                    </h3>
+                    <small class="text-light">Selecione pelo menos 10 questões e defina os pesos</small>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Mensagens de erro/sucesso -->
+                    {% include 'simulado/messages.html' %}
+
+                    <form method="post" id="simuladoForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Coluna principal do formulário -->
+                            <div class="col-lg-8">
+                                <!-- Campo Tema -->
+                                <div class="form-floating mb-4">
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="tema" 
+                                        name="tema" 
+                                        placeholder="Tema do simulado"
+                                        required
+                                        minlength="5"
+                                        maxlength="30"
+                                        value="{{ request.POST.tema|default:'' }}"
+                                    >
+                                    <label for="tema">
+                                        <i class="bi bi-bookmark me-1"></i>
+                                        Tema do Simulado *
+                                    </label>
+                                    <div class="form-text">
+                                        O tema deve ter entre 5 e 30 caracteres
+                                    </div>
+                                </div>
+
+                                <!-- Botão para criar nova questão -->
+                                <div class="text-center mb-4">
+                                    <a href="{% url 'simulado:criar_questao' %}" class="btn btn-criar-questao">
+                                        <i class="bi bi-plus-lg me-2"></i>
+                                        Criar Nova Questão
+                                    </a>
+                                    <p class="text-muted mt-2 mb-0">
+                                        <small>Clique aqui se deseja cadastrar novas questões antes de criar o simulado</small>
+                                    </p>
+                                </div>
+
+                                <!-- Lista de questões disponíveis -->
+                                <h5 class="mb-3">
+                                    <i class="bi bi-list-ul me-2"></i>
+                                    Questões Disponíveis
+                                    {% if questoes_disponiveis %}
+                                    <span class="badge bg-info">{{ questoes_disponiveis|length }} disponíveis</span>
+                                    {% endif %}
+                                </h5>
+                                
+                                {% if questoes_disponiveis %}
+                                <div class="questoes-grid">
+                                    {% for questao in questoes_disponiveis %}
+                                    <div class="questao-card p-3" data-questao-id="{{ questao.id }}">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input questao-checkbox" 
+                                                        type="checkbox" 
+                                                        value="{{ questao.id }}" 
+                                                        id="questao_{{ questao.id }}" 
+                                                        name="questoes"
+                                                    >
+                                                    <label class="form-check-label w-100" for="questao_{{ questao.id }}">
+                                                        {% if questao.assunto %}
+                                                        <span class="questao-assunto me-2">{{ questao.assunto }}</span>
+                                                        {% endif %}
+                                                        <strong>{{ questao.enunciado|truncatechars:80 }}</strong>
+                                                        {% if questao.enunciado|length > 80 %}
+                                                        <div class="mt-2">
+                                                            <small class="text-muted">{{ questao.enunciado }}</small>
+                                                        </div>
+                                                        {% endif %}
+                                                        <div class="mt-1">
+                                                            <small class="text-muted">
+                                                                <i class="bi bi-person me-1"></i>
+                                                                Criada por: {{ questao.usuario.nome|default:questao.usuario.username }}
+                                                            </small>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="row align-items-center">
+                                                    <div class="col-auto">
+                                                        <label for="peso_questao_{{ questao.id }}" class="form-label mb-0">
+                                                            <small><strong>Peso:</strong></small>
+                                                        </label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input 
+                                                            type="number" 
+                                                            class="form-control peso-input" 
+                                                            id="peso_questao_{{ questao.id }}" 
+                                                            name="peso_questao_{{ questao.id }}"
+                                                            min="1" 
+                                                            max="10" 
+                                                            placeholder="1-10"
+                                                            value="5"
+                                                            disabled
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="alert alert-warning text-center">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    <strong>Nenhuma questão disponível!</strong>
+                                    <p class="mb-2">Você precisa criar questões antes de poder criar um simulado.</p>
+                                    <a href="{% url 'simulado:criar_questao' %}" class="btn btn-warning">
+                                        <i class="bi bi-plus-lg me-1"></i>
+                                        Criar Primeira Questão
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Coluna lateral com informações -->
+                            <div class="col-lg-4">
+                                <div class="contador-questoes">
+                                    <h4 class="mb-3">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Status do Simulado
+                                    </h4>
+                                    <div class="mb-3">
+                                        <h2 class="mb-1" id="questoes-selecionadas">0</h2>
+                                        <small>questões selecionadas</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small class="text-light">Mínimo necessário: <strong>10 questões</strong></small>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 10px;">
+                                        <div 
+                                            class="progress-bar bg-success" 
+                                            role="progressbar" 
+                                            id="progress-questoes"
+                                            style="width: 0%"
+                                            aria-valuenow="0"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"
+                                        ></div>
+                                    </div>
+                                    <div id="status-simulado" class="text-warning">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Selecione mais questões
+                                    </div>
+                                </div>
+
+                                {% if questoes_disponiveis %}
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-success btn-lg" id="btn-criar-simulado" disabled>
+                                        <i class="bi bi-check-lg me-2"></i>
+                                        Criar Simulado
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="btn-limpar">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>
+                                        Limpar Seleção
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script personalizado -->
+<script src="{% static 'js/criar_simulado.js' %}"></script>
+{% endblock %}

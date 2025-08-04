@@ -18,6 +18,7 @@ urlpatterns = [
     path("simulados/", ListarSimuladosView.as_view(), name="listar_simulados"),
     path("simulados/<int:simulado_id>/", DetalharSimuladoView.as_view(), name="detalhar_simulado"),
     path("simulados/<int:simulado_id>/resultado/", CalcularResultadoView.as_view(), name="calcular_resultado"),
+    path("simulados/criar/", CriarSimuladoView.as_view(), name="criar_simulado"),
 
     # URL patterns for questões
     path("questoes/", ListarQuestoesView.as_view(), name="listar_questoes"),

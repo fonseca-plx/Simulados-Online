@@ -1,0 +1,158 @@
+/* Estilos específicos para o formulário de criação de simulado */
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .questao-card .row {
+        flex-direction: column;
+    }
+    
+    .questao-card .col-md-8,
+    .questao-card .col-md-4 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .peso-input {
+        max-width: 100px;
+        margin: 0 auto;
+    }
+    
+    .contador-questoes {
+        position: static;
+        margin-bottom: 20px;
+    }
+    
+    .questoes-grid {
+        max-height: 400px;
+    }
+}
+
+/* Melhorias visuais para acessibilidade */
+.questao-card:focus-within {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.questao-checkbox:focus {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.peso-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Animações suaves */
+.questao-card {
+    transform: translateZ(0);
+}
+
+.questao-card.selected {
+    animation: cardSelect 0.3s ease-out;
+}
+
+@keyframes cardSelect {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Loading state para o botão */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Melhorias no progress bar */
+.progress {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+}
+
+.progress-bar {
+    border-radius: 50px;
+    transition: width 0.3s ease;
+}
+
+/* Estilo para questões com erro */
+.questao-card.erro {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.questao-card.erro .peso-input {
+    border-color: #dc3545;
+}
+
+/* Tooltip personalizado */
+.tooltip-custom {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip-custom::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.tooltip-custom::after {
+    content: "";
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #333;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+}
+
+.tooltip-custom:hover::before,
+.tooltip-custom:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
