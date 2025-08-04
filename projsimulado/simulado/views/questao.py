@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, DetailView
 from simulado.services.casousoquestao import QuestaoService
-from simulado.models import Questao
+from simulado.models import Questao, Usuario
 from django.core.exceptions import ValidationError
 from simulado.utils import Mensagens
 
@@ -37,16 +37,32 @@ class CriarQuestaoView(View):
         """
         Processa o formulário de criação de questão.
         """
+        if not request.user.is_authenticated:
+            return redirect('simulado:login')
+            
         enunciado = request.POST.get('enunciado')
         assunto = request.POST.get('assunto')
-        usuario = request.user  # Assume que o usuário está autenticado
-        alternativas_data = [
-            {
-                'texto': request.POST.get(f'alternativa_{i}'),
-                'correta': request.POST.get(f'correta_{i}') == 'on'
-            }
-            for i in range(1, 6)  # Espera 5 alternativas
-        ]
+        
+        # Converter o User para Usuario
+        try:
+            usuario = Usuario.objects.get(id=request.user.id)
+        except Usuario.DoesNotExist:
+            Mensagens.processar_erros_validacao(
+                request, 
+                ValidationError("Usuário não encontrado. Faça login novamente.")
+            )
+            return redirect('simulado:login')
+            
+        alternativas_data = []
+        alternativa_correta_index = request.POST.get('alternativa_correta')
+        
+        for i in range(1, 6):  # Espera 5 alternativas
+            texto = request.POST.get(f'alternativa_{i}')
+            correta = str(i) == alternativa_correta_index
+            alternativas_data.append({
+                'texto': texto,
+                'correta': correta
+            })
 
         # Chamar o serviço para criar a questão
         try:

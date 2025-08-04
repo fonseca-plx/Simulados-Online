@@ -69,6 +69,9 @@ class QuestaoService:
                     )
                     alternativa.save()
                 
+                # Validar as alternativas após todas serem criadas
+                questao.validar_alternativas()
+                
                 return questao
                 
         except ValidationError as e:

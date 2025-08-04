@@ -50,6 +50,18 @@ class Questao(models.Model):
             raise ValidationError({'enunciado': 'O enunciado deve ter pelo menos 10 caracteres.'})
         if len(self.enunciado) > 1000:
             raise ValidationError({'enunciado': 'O enunciado não pode ter mais de 1000 caracteres.'})
+    
+    def validar_alternativas(self):
+        """
+        Valida se a questão tem exatamente uma alternativa correta.
+        Este método deve ser chamado após todas as alternativas serem criadas.
+        """
+        if self.pk:  # Só valida se a questão já foi salva
+            alternativas_corretas = self.alternativas.filter(correta=True).count()
+            if alternativas_corretas == 0:
+                raise ValidationError({'alternativas': 'A questão deve ter pelo menos uma alternativa marcada como correta.'})
+            elif alternativas_corretas > 1:
+                raise ValidationError({'alternativas': 'A questão deve ter exatamente uma alternativa marcada como correta.'})
         
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -61,7 +73,7 @@ class Questao(models.Model):
     class Meta:
         verbose_name = 'Questão'
         verbose_name_plural = 'Questões'
-        ordering = ['enunciado']
+        ordering = ['assunto']
 
 class Alternativa(models.Model):
     texto = models.TextField()
@@ -72,14 +84,14 @@ class Alternativa(models.Model):
         erros = {}
         if len(self.texto) > 100:
             erros['texto'] = 'O texto da alternativa não pode ter mais de 100 caracteres.'
-        if self.questao.alternativas.filter(texto=self.texto).exclude(id=self.id).exists():
-            erros['texto'] = 'Já existe uma alternativa com este texto para esta questão.'
         if not self.questao:
             erros['questao'] = 'A alternativa deve estar associada a uma questão.'
-        if self.correta and self.questao.alternativas.filter(correta=True).exclude(id=self.id).exists():
-            erros['correta'] = 'Já existe uma alternativa correta para esta questão.'
-        if not self.correta and not self.questao.alternativas.filter(correta=True).exists():
-            erros['correta'] = 'Pelo menos uma alternativa deve ser marcada como correta para esta questão.'        
+        else:
+            # Só faz validações que dependem da questão se ela existir
+            if self.questao.alternativas.filter(texto=self.texto).exclude(id=self.id).exists():
+                erros['texto'] = 'Já existe uma alternativa com este texto para esta questão.'
+            if self.correta and self.questao.alternativas.filter(correta=True).exclude(id=self.id).exists():
+                erros['correta'] = 'Já existe uma alternativa correta para esta questão.'
         
         if erros:
             raise ValidationError(erros)
