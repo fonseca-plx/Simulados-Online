@@ -6,99 +6,6 @@
 
 {% block style %}
 <link href="{% static 'css/criar_simulado.css' %}" rel="stylesheet">
-<style>
-    .questao-card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-        background: #fff;
-    }
-    
-    .questao-card:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        border-color: #007bff;
-    }
-    
-    .questao-card.selected {
-        border-color: #28a745;
-        box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
-        background-color: #f8fff9;
-    }
-    
-    .questao-checkbox {
-        transform: scale(1.2);
-        margin-right: 10px;
-    }
-    
-    .peso-input {
-        max-width: 80px;
-    }
-    
-    .questao-assunto {
-        background-color: #007bff;
-        color: white;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        font-weight: 500;
-    }
-    
-    .contador-questoes {
-        top: 20px;
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-    }
-    
-    .btn-criar-questao {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        border: none;
-        border-radius: 25px;
-        padding: 12px 30px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 15px rgba(40,167,69,0.3);
-        transition: all 0.3s ease;
-    }
-    
-    .btn-criar-questao:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(40,167,69,0.4);
-    }
-    
-    .form-floating {
-        margin-bottom: 20px;
-    }
-    
-    .questoes-grid {
-        max-height: 600px;
-        overflow-y: auto;
-        padding-right: 10px;
-    }
-    
-    .questoes-grid::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    .questoes-grid::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-    
-    .questoes-grid::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 10px;
-    }
-    
-    .questoes-grid::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -106,7 +13,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white text-center">
+                <div class="card-header card-header-custom text-white text-center">
                     <h3 class="mb-0">
                         <i class="bi bi-plus-circle me-2"></i>
                         Criar Novo Simulado
