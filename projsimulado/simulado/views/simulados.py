@@ -5,7 +5,6 @@ from simulado.services.casousosimulado import SimuladoService
 from simulado.models import Simulado, Usuario, Questao
 from django.core.exceptions import ValidationError
 from simulado.utils import Mensagens
-from django.contrib import messages
 
 class ListarSimuladosView(ListView):
     template_name = 'simulado/sim/lista.html'
@@ -97,7 +96,7 @@ class CriarSimuladoView(View):
                 questoes_ids=questoes_ids,
                 pesos_questoes=pesos_questoes
             )
-            messages.success(request, f"O simulado sobre {simulado.tema} foi criado com sucesso!")
+            Mensagens.sucesso(request, f"O simulado sobre {simulado.tema} foi criado com sucesso!")
             return redirect('simulado:detalhar_simulado', simulado_id=simulado.id)
         except ValidationError as e:
             Mensagens.processar_erros_validacao(request, e)
