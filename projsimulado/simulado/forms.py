@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from simulado.models import Usuario
+import re
 
 class UsuarioForm(forms.Form):
     """Formulário para criação de um novo usuário."""
@@ -47,18 +48,36 @@ class UsuarioForm(forms.Form):
         nome = self.cleaned_data.get('nome')
         if not nome:
             raise ValidationError("O nome completo é obrigatório.")
+        if len(nome) < 3:
+            raise ValidationError('O nome deve ter pelo menos 3 caracteres.')
         return nome
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if Usuario.objects.filter(username=username).exists():
             raise ValidationError("Este nome de usuário já está em uso.")
+        if len(username) < 3:
+            raise ValidationError('O nome de usuário deve ter pelo menos 3 caracteres.')
         return username
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        if len(password) < 8:
-            raise ValidationError("A senha deve ter pelo menos 8 caracteres.")
+        erros = []
+        
+        if len(password) < 6:
+            erros.append('A senha deve ter pelo menos 6 caracteres.')
+        if not re.search(r'[A-Z]', password):
+            erros.append('A senha deve conter pelo menos uma letra maiúscula.')
+        if not re.search(r'[a-z]', password):
+            erros.append('A senha deve conter pelo menos uma letra minúscula.')
+        if not re.search(r'\d', password):
+            erros.append('A senha deve conter pelo menos um dígito.')
+        if not re.search(r'[@$!%*?&]', password):
+            erros.append('A senha deve conter pelo menos um caractere especial.')
+        
+        if erros:
+            raise ValidationError(erros)
+        
         return password
     
     def clean(self):

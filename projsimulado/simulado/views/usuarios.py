@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
 from simulado.utils import GerenciarSessao, Mensagens
+from django.contrib import messages
 from simulado.forms import UsuarioForm
 from simulado.services.casousousuario import UsuarioService
 
@@ -39,6 +40,7 @@ class CadastrarUsuarioView(View):
 
                 if usuario:
                     login(request, usuario)
+                    messages.success(request, "Usuário cadastrado com sucesso!")
                     return redirect('simulado:index')
                 
             except ValidationError as e:
@@ -67,7 +69,7 @@ class LoginView(View):
         
         user = authenticate(request, username=username, password=password)
         
-        if user is not None:
+        if user:
             login(request, user)
             return redirect('simulado:index')
         else:

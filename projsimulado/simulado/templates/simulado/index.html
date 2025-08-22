@@ -8,7 +8,7 @@
         <h1 class="display-5 fw-bold">Bem-vindo ao Simulados Online!</h1>
 
         {% if user.is_authenticated %}
-            <p class="lead">Olá, {{ user }}.</p>
+            <p class="lead">Olá, {{ user.usuario }}</p>
             <p class="lead">Você pode cadastrar novas questões, criar novos simulados ou ver os simulados disponíveis.</p>
             <a href="{% url 'simulado:criar_questao' %}" class="btn btn-primary mt-3">
                 Cadastrar Questões

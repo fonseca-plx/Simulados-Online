@@ -1,42 +1,20 @@
 {% extends 'simulado/base.html' %}
-
-{% block title %}Criar Nova Questão - Simulados Online{% endblock %}
-
 {% load static %}
+
+{% block title %}{% if questao %}Editar{% else %}Nova{% endif %} Questão - Simulados Online{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8">
         <div class="card shadow-lg">
             <div class="card-header card-header-custom text-white text-center">
-                <h3 class="mb-0">
-                    <i class="bi bi-plus-circle me-2"></i>
-                    Criar Nova Questão
+                <h3 class="card-title mb-0">
+                    <i class="bi bi-{% if questao %}pencil-square{% else %}plus-circle{% endif %} me-2"></i>
+                    {% if questao %}Editar Questão{% else %}Criar Nova Questão{% endif %}
                 </h3>
-                <small class="text-light">Preencha todos os campos obrigatórios para criar uma questão</small>
+                <small class="text-light">Preencha todos os campos obrigatórios</small>
             </div>
-            
-            <div class="card-body p-4">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags|default:'danger' }} alert-custom alert-dismissible fade show" role="alert">
-                            <strong>
-                                {% if message.tags == 'error' or message.tags == 'danger' %}
-                                    <i class="bi bi-exclamation-triangle me-2"></i>Erro!
-                                {% elif message.tags == 'warning' %}
-                                    <i class="bi bi-exclamation-circle me-2"></i>Atenção!
-                                {% elif message.tags == 'success' %}
-                                    <i class="bi bi-check-circle me-2"></i>Sucesso!
-                                {% else %}
-                                    <i class="bi bi-info-circle me-2"></i>Info!
-                                {% endif %}
-                            </strong>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
+            <div class="card-body">                    
                 <form method="post" id="questaoForm">
                     {% csrf_token %}
                     
@@ -148,5 +126,6 @@
         </div>
     </div>
 </div>
+
 <script src="{% static 'js/questaovalidation.js' %}"></script>
 {% endblock %}

@@ -5,6 +5,7 @@ from simulado.services.casousoquestao import QuestaoService
 from simulado.models import Questao, Usuario
 from django.core.exceptions import ValidationError
 from simulado.utils import Mensagens
+from django.contrib import messages
 
 class ListarQuestoesView(ListView):
     template_name = 'simulado/questoes/lista.html'
@@ -72,6 +73,7 @@ class CriarQuestaoView(View):
                 usuario=usuario,
                 alternativas_data=alternativas_data
             )
+            messages.success(request, "Questão salva com sucesso!")
             return redirect('simulado:listar_questoes')
         except ValidationError as e:
             Mensagens.processar_erros_validacao(request, e)

@@ -8,26 +8,6 @@ import re
 class Usuario(User):
     nome = models.CharField(max_length=50)
 
-    def clean(self):
-        erros = {}
-        if len(self.nome) < 3:
-            erros['nome'] = 'O nome deve ter pelo menos 3 caracteres.'
-        if len(self.username) < 3:
-            erros['username'] = 'O nome de usuário deve ter pelo menos 3 caracteres.'
-        if len(self.password) < 6:
-            erros['password'] = 'A senha deve ter pelo menos 6 caracteres.'
-        if not re.search(r'[A-Z]', self.password):
-            erros['password'] = 'A senha deve conter pelo menos uma letra maiúscula.'
-        if not re.search(r'[a-z]', self.password):
-            erros['password'] = 'A senha deve conter pelo menos uma letra minúscula.'
-        if not re.search(r'\d', self.password):
-            erros['password'] = 'A senha deve conter pelo menos um dígito.'
-        if not re.search(r'[@$!%*?&]', self.password):
-            erros['password'] = 'A senha deve conter pelo menos um caractere especial.'
-        
-        if erros:
-            raise ValidationError(erros)
-
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)

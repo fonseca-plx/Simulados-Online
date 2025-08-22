@@ -5,6 +5,7 @@ from simulado.services.casousosimulado import SimuladoService
 from simulado.models import Simulado, Usuario, Questao
 from django.core.exceptions import ValidationError
 from simulado.utils import Mensagens
+from django.contrib import messages
 
 class ListarSimuladosView(ListView):
     template_name = 'simulado/sim/lista.html'
@@ -54,6 +55,13 @@ class CriarSimuladoView(View):
             return redirect('simulado:login')
         
         tema = request.POST.get('tema')
+
+        # Buscar todas as questões disponíveis para seleção
+        questoes_disponiveis = Questao.objects.all().order_by('assunto', 'enunciado')
+        
+        context = {
+            'questoes_disponiveis': questoes_disponiveis
+        }
         
         # Obter questões selecionadas pelo usuário
         questoes_selecionadas = request.POST.getlist('questoes')  # Lista de IDs das questões
@@ -89,16 +97,17 @@ class CriarSimuladoView(View):
                 questoes_ids=questoes_ids,
                 pesos_questoes=pesos_questoes
             )
+            messages.success(request, f"O simulado sobre {simulado.tema} foi criado com sucesso!")
             return redirect('simulado:detalhar_simulado', simulado_id=simulado.id)
         except ValidationError as e:
             Mensagens.processar_erros_validacao(request, e)
-            return render(request, self.template_name)
+            return render(request, self.template_name, context)
         except ValueError as e:
             Mensagens.processar_erros_validacao(
                 request, 
                 ValidationError("IDs de questões inválidos fornecidos.")
             )
-            return render(request, self.template_name)
+            return render(request, self.template_name, context)
 
 class CalcularResultadoView(View):
     def get(self, request, *args, **kwargs):
